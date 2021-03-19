@@ -2,6 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from myconfig import *
+from savetofile import save_metrics_to_file
 from servicehandler import get_df_from_file
 
 def algo_controller(filenameService, saturatedMetrics):
@@ -37,15 +39,19 @@ def algo_controller(filenameService, saturatedMetrics):
     print("Sorted combined df: ")
     print(sorted_latency)
 
-    latency_algo(sorted_latency, service)
+
     if latency_algo(sorted_latency, service):
         errorValue = error_algo(sortedErrorByValue, saturatedMetrics, service)
         if (errorValue != 0):
             print("\n*****Scale: %s if traffic exceed:     %s http per s******" % (service, errorValue))
+            print("Metrics: " )
+            print(metricQuery_okHTTP)
+            save_metrics_to_file(service, errorValue, "error")
         else:
-            print("\n*****Scale: %s if latency exceed:     %s *****" % (service, maxLatency))
-
-        #if increased replica descresed latency where service is destination by more than 500 ms return true
+            print("\n*****Scale: %s if latency exceed:     %s ms*****" % (service, maxLatency))
+            print("Metrics: " )
+            print(metricQuery_latency)
+            save_metrics_to_file(service, maxLatency, "latency")
    
 
 def latency_algo(df, service):
